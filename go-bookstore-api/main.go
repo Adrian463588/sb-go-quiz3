@@ -1,21 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"go-bookstore-api/config"
 	"go-bookstore-api/models"
 	"go-bookstore-api/routes"
-	"log"
+	"os" // <-- Impor package 'os'
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Load environment variables dari .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// Coba muat file .env, tapi jangan hentikan program jika tidak ada.
+	godotenv.Load()
 
 	// Koneksi ke database
 	config.ConnectDatabase()
@@ -29,6 +27,13 @@ func main() {
 	// Setup semua rute
 	routes.SetupRouter(r)
 
-	// Jalankan server
-	r.Run()
+	// Menggunakan port dinamis yang diberikan oleh Railway, atau 8080 untuk lokal
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Port default untuk pengembangan lokal
+	}
+
+	fmt.Println("Starting server on port " + port)
+	// Jalankan server di port yang sudah ditentukan
+	r.Run(":" + port)
 }
